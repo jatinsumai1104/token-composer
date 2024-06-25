@@ -5,8 +5,12 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
-User.create(name: 'Sony', email: 'sony@sample.com', age: '40')
-User.create(name: 'Fredo', email: 'fred@sample.com', age: '38')
-User.create(name: 'Tom', email: 'tom@sample.com', age: '35')
-User.create(name: 'Michael', email: 'michael@sample.com', age: '33')
-User.create(name: 'Connie', email: 'connie@sample.com', age: '30')
+
+10000.times.each do
+  Token.create({blocked: true, blocked_at: Time.zone.now, alive_till: Time.zone.now + 5.minutes, deleted: true})
+end
+Token.create({alive_till: Time.zone.now + 5.minutes})
+
+Token.create({alive_till: Time.zone.now + 5.minutes})
+Token.create({blocked: true, blocked_at: Time.zone.now, alive_till: Time.zone.now + 5.minutes})
+Token.create({alive_till: Time.zone.now + 5.minutes})
