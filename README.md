@@ -1,24 +1,41 @@
-# README
+# Token Orchestrator
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Design a server capable of generating, assigning, and managing API keys with specific functionalities. The server should offer various endpoints for interaction:
+* An endpoint to create new keys. Each generated key has a life of 5 minutes after which it gets deleted automatically if the keep-alive operation is not run for that key (More details mentioned below).
+* An endpoint to retrieve an available key, ensuring the key is randomly selected and not currently in use. This key should then be blocked from being served again until its status changes. If no keys are available, a 404 error should be returned.
+* An endpoint to unblock a previously assigned key, making it available for reuse.
+* An endpoint to permanently remove a key from the system.
+* An endpoint for key keep-alive functionality, requiring clients to signal every 5 minutes to prevent the key from being deleted.
+* Automatically release blocked keys within 60 seconds if not unblocked explicitly.
 
-Things you may want to cover:
+## Constraints:
+Ensuring efficient key management without the need to iterate through all keys for any operation. The complexity of endpoint requests should be aimed at O(log n) or O(1) for scalability and efficiency.
 
-* Ruby version
+## Endpoints:
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+* POST /keys: Generate new keys.
+  * Status: 201
+* GET /keys: Retrieve an available key for client use.
+  * Status: 200 / 404
+  * Response
+    ```json
+      {
+        "keyId" : "<keyID>"
+      }
+    ```
+* GET /keys/:id: Provide information (e.g., assignment timestamps) about a specific key.
+  * Status: 200 / 404
+  * Response
+    ```json
+      {
+        "isBlocked" : "<true> / <false>",
+        "blockedAt" : "<blockedTime>",
+        "createdAt" : "<createdTime>"
+      }
+    ```
+* DELETE /keys/:id: Remove a specific key, identified by :id, from the system.
+  * Status: 200 / 404
+* PUT /keys/:id: Unblock a key for further use.
+  * Status: 200 / 404
+* PUT /keepalive/:id: Signal the server to keep the specified key, identified by :id, from being deleted.
+  * Status: 200 / 404
