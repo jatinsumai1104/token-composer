@@ -7,12 +7,14 @@ class TokenHelper
 
   # We can sync this method so that no two user can access the same token
   def fetch_random_token
-    token = Token.where(blocked: false).first
-    raise ::ActiveRecord::RecordNotFound if token.blank?
-    token.update_columns(blocked: true, blocked_at: Time.zone.now)
-    self.class.delay_for(30.seconds).unblock_key(token.id)
-    # To sync the block, I apply redis lock on token id and inside block we first check if blocked is still false
-    {keyId: token.id}
+    ActiveRecord::Base.transaction do
+      token = Token.lock.where(blocked: false).first
+      raise ::ActiveRecord::RecordNotFound if token.blank?
+      token.update_columns(blocked: true, blocked_at: Time.zone.now)
+      self.class.delay_for(30.seconds).unblock_key(token.id)
+      # To sync the block, I apply redis lock on token id and inside block we first check if blocked is still false
+      {keyId: token.id}
+    end
   end
 
   def get_token(id)

@@ -11,6 +11,7 @@ module V1
 
       desc 'Get Token'
       get do
+        Rails.logger.info("Get Token #{Time.zone.now.strftime("%H:%M:%S:%L")}")
         TokenHelper.new.fetch_random_token
       end
 
