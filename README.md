@@ -39,3 +39,16 @@ Ensuring efficient key management without the need to iterate through all keys f
   * Status: 200 / 404
 * PUT /keepalive/:id: Signal the server to keep the specified key, identified by :id, from being deleted.
   * Status: 200 / 404
+ 
+## Solution
+### Database Design
+| Column | Type  |
+| ------- | --- |
+| id | UUID |
+| blocked | Boolean |
+| blocked_at | Timestamp |
+| alive_till | Timestamp |
+| deleted | Boolean |
+| created_at | Timestamp |
+| updated_at | Timestamp |
+| Index (id, blocked WHERE NOT deleted AND NOT blocked) | btree |
